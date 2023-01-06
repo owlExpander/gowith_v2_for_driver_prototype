@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
+import 'package:just_audio/just_audio.dart';
 
-const String appTitle = '동행 v2 (기사님용) 프로토타입 v0.1';
+import '_commonLIb.dart';
+import '_qrCodeScanner.dart';
+
+const String appTitle = '동행 v2 (기사님용) 프로토타입 v0.1.1';
 
 void main() {
   runApp(const MyApp());
@@ -41,39 +44,20 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton.icon(
               icon: const Icon(Icons.bus_alert),
               label: const Text("운행 시작"),
-              onPressed: () async {
-                if (await checkCamaraPermission()) {
-                  String? cameraScanResult = await scanner.scan();
+              onPressed: ()  {
+                final player = AudioPlayer();
+                player.setAsset('/audio/ddiring.wav');
+                player.setVolume(1);
+                player.play();
 
-                  if (cameraScanResult != null) {
-                    showAlertDialog(cameraScanResult);
-                  }
-                }
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const QRViewExample(),
+                ));
               },
             ),
           ],
         ),
       ),
-    );
-  }
-
-  void showAlertDialog(String msg) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Text(msg),
-          actions: <Widget>[
-            ElevatedButton(
-              child: const Text("확인"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      }
     );
   }
 }
