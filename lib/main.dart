@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:location/location.dart';
 
 import '_commonLIb.dart';
 import '_qrCodeScanner.dart';
 
-const String appTitle = '동행 v2 (기사님용) 프로토타입 v0.1.1';
+const String appTitle = '동행 v2 (기사님용) 프로토타입 v0.1.2';
 
 void main() {
   runApp(const MyApp());
@@ -31,6 +33,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late double? lat;
+  late double? lng;
+  int nCheckCnt = 0;
+  late String strLat = '';
+  late String strLng = '';
+  Location location = Location();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _locateMe(); // 최초 1회 실행
+    Timer.periodic(Duration(seconds: 5), (timer) {  // 일정 시간 간격으로 반복
+      _locateMe();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,35 +74,44 @@ class _MyHomePageState extends State<MyHomePage> {
                 ));
               },
             ),
+            const SizedBox(height: 50,),
+            Text('$nCheckCnt회 위치 조회'),
+            Text(strLat),
+            Text(strLng),
           ],
         ),
       ),
     );
   }
-}
 
-/// QR 촬영을 위해 카메라와 저장소 권한 획득 여부를 확인 및 요청
-Future<bool> checkCamaraPermission() async {
-  bool bPerm = false;
+  /// 현재 위치 조회
+  _locateMe() async {
+    bool serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        return;
+      }
+    }
 
-  // 카메라와 저장소 권한 요청
-  Map<Permission, PermissionStatus> permStatMap = await [
-    Permission.camera,
-    Permission.storage,
-  ].request();
+    PermissionStatus permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    await location.getLocation().then((res) {
+      setState(() {
+        lat = res.latitude;
+        lng = res.longitude;
 
-  print(permStatMap[Permission.camera]);
-  print(permStatMap[Permission.storage]);
-
-  // 카메라와 저장소 권한을 획득한 상태이면..
-  // ? : nullable
-  // ! : 절대 null은 리턴되지 않는다고 명시
-  if (permStatMap[Permission.camera]!.isGranted && permStatMap[Permission.storage]!.isGranted) {
-    bPerm = true;
-  } else {
-    openAppSettings();
+        if (lat != null) {
+          nCheckCnt++;
+          strLat = '현재 위도 : $lat';
+          strLng = '현재 경도 : $lng';
+        }
+      });
+    });
   }
-
-  return bPerm;
 }
-
