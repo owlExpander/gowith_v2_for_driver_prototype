@@ -61,8 +61,9 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton.icon(
-              icon: const Icon(Icons.bus_alert),
+              icon: const Icon(Icons.bus_alert, size: 50),
               label: const Text("운행 시작"),
+              style: ElevatedButton.styleFrom(minimumSize: const Size(300, 100), textStyle: const TextStyle(fontSize: 50)),
               onPressed: ()  {
                 final player = AudioPlayer();
                 player.setAsset('/audio/ddiring.mp3');

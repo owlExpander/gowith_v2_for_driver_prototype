@@ -81,8 +81,9 @@ class _QRViewExampleState extends State<QRViewExample> {
 
         await controller?.pauseCamera();
 
+        // 폰에서 내부 assets 경로 인식 되지 않는 이슈 해결 못해서 일단 외부 경로로 처리 ㅠ 
         final player = AudioPlayer();
-        player.setAudioSource(AudioSource.uri(Uri.parse('http://impulss13.dothome.co.kr/_mp3/ddiring.mp3')));
+        player.setAudioSource(AudioSource.uri(Uri.parse('http://impulss13.dothome.co.kr/_mp3/ddiring.wav')));
         player.setVolume(1);
         player.play();
 
