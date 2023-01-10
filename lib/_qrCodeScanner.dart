@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -23,6 +24,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   @override
   void reassemble() {
     super.reassemble();
+
     if (Platform.isAndroid) {
       controller!.pauseCamera();
     }
@@ -31,11 +33,17 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   Widget build(BuildContext context) {
+
+    // QR 촬영 화면일땐 가로모드로 전환
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+
     return Scaffold(
       body: Column(
         children: <Widget>[
           Expanded(flex: 4, child: _buildQrView(context)),
-
         ],
       ),
     );
@@ -74,7 +82,7 @@ class _QRViewExampleState extends State<QRViewExample> {
         await controller?.pauseCamera();
 
         final player = AudioPlayer();
-        player.setAsset('/audio/ddiring.mp3');
+        player.setAudioSource(AudioSource.uri(Uri.parse('http://impulss13.dothome.co.kr/_mp3/ddiring.mp3')));
         player.setVolume(1);
         player.play();
 
@@ -97,6 +105,13 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   void dispose() {
+
+    // QR 화면에서 나갈땐 세로모드로 복구
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     controller?.dispose();
     super.dispose();
   }

@@ -7,7 +7,7 @@ import 'package:location/location.dart';
 import '_commonLIb.dart';
 import '_qrCodeScanner.dart';
 
-const String appTitle = '동행 v2 (기사님용) 프로토타입 v0.1.2';
+const String appTitle = '동행 v2 (기사님용) 프로토타입 v0.1.3';
 
 void main() {
   runApp(const MyApp());
@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("운행 시작"),
               onPressed: ()  {
                 final player = AudioPlayer();
-                player.setAsset('/audio/ddiring.wav');
+                player.setAsset('/audio/ddiring.mp3');
                 player.setVolume(1);
                 player.play();
 
